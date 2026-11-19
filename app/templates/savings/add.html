@@ -1,0 +1,109 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Savings Goal | Home Finance</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body class="page-savings-add">
+
+    <nav class="navbar">
+        <h2><img class="site-logo" src="{{ url_for('static', filename='kd-logo.jpg') }}" alt="">Home Finance</h2>
+    </nav>
+
+    <main class="container">
+
+        <section class="card">
+
+            <h1>Add Savings Goal</h1>
+            <p class="subtitle">
+                Create a goal and start managing your savings.
+            </p>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% for category, message in messages %}
+                    <div class="flash {{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endwith %}
+
+            <form method="POST">
+
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                <div class="form-group">
+                    <label for="name">Goal Name *</label>
+                    <input
+                        type="text"
+                        id="name"
+                        name="name"
+                        placeholder="Example: Emergency Fund"
+                        value="{{ request.form.get('name', '') }}"
+                        maxlength="100"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="target_amount">Target Amount (JPY) *</label>
+                    <input
+                        type="number"
+                        id="target_amount"
+                        name="target_amount"
+                        placeholder="Example: 500000"
+                        min="0.01"
+                        step="0.01"
+                        value="{{ request.form.get('target_amount', '') }}"
+                        required
+                    >
+                    <span class="help-text">
+                        The total amount you want to save.
+                    </span>
+                </div>
+
+                <div class="form-group">
+                    <label for="opening_balance">Opening Balance (JPY)</label>
+                    <input
+                        type="number"
+                        id="opening_balance"
+                        name="opening_balance"
+                        placeholder="Example: 10000"
+                        min="0"
+                        step="0.01"
+                        value="{{ request.form.get('opening_balance', '0') }}"
+                    >
+                    <span class="help-text">
+                        Money already saved before using this application. Enter 0 if none.
+                    </span>
+                </div>
+
+                <div class="form-group">
+                    <label for="description">Description</label>
+                    <textarea
+                        id="description"
+                        name="description"
+                        placeholder="Describe why you are saving this money..."
+                    >{{ request.form.get('description', '') }}</textarea>
+                </div>
+
+                <div class="buttons">
+                    <button type="submit" class="button save-button">
+                        Create Savings Goal
+                    </button>
+
+                    <a href="{{ url_for('savings.index') }}"
+                       class="button cancel-button">
+                        Cancel
+                    </a>
+                </div>
+
+            </form>
+
+        </section>
+
+    </main>
+
+</body>
+</html>

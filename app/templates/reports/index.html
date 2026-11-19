@@ -1,0 +1,246 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Financial Reports | Home Finance</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body class="page-reports-index">
+
+    <nav class="navbar">
+        <div class="navbar-content">
+            <h2><img class="site-logo" src="{{ url_for('static', filename='kd-logo.jpg') }}" alt="">Home Finance</h2>
+
+            <div>
+                <a href="{{ url_for('main.dashboard') }}">Dashboard</a>
+                <a href="{{ url_for('reports.index') }}">Reports</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container">
+
+        <div class="page-header">
+            <h1>Financial Reports</h1>
+
+            <form method="GET"
+                  action="{{ url_for('reports.index') }}"
+                  class="month-form">
+
+                <input
+                    type="month"
+                    name="month"
+                    value="{{ selected_month }}"
+                    required
+                >
+
+                <button type="submit" class="filter-button">
+                    View Report
+                </button>
+
+            </form>
+            <a
+                href="{{ url_for('reports.export_csv', month=selected_month) }}"
+                class="export-button">
+                Download CSV
+            </a>
+            <a
+                href="{{ url_for('reports.export_pdf', month=selected_month) }}"
+                class="pdf-button">
+                Download PDF
+            </a>
+        </div>
+
+        <h2 class="section-title">
+            Monthly Overview
+        </h2>
+
+        <div class="summary-grid">
+
+            <div class="card">
+                <div class="card-label">Total Income</div>
+                <div class="card-value income-value">
+                    ¥{{ "{:,.0f}".format(total_income) }}
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-label">Total Expenses</div>
+                <div class="card-value expense-value">
+                    ¥{{ "{:,.0f}".format(total_expenses) }}
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-label">Cash In</div>
+                <div class="card-value">
+                    ¥{{ "{:,.0f}".format(total_cash_in) }}
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-label">Cash Out</div>
+                <div class="card-value">
+                    ¥{{ "{:,.0f}".format(total_cash_out) }}
+                </div>
+            </div>
+
+        </div>
+
+        <h2 class="section-title">
+            Monthly Cash Movement
+        </h2>
+
+        <div class="card">
+            <div class="card-label">
+                Net Cash Movement
+            </div>
+
+            <div class="card-value
+                {% if net_cash_movement >= 0 %}
+                    net-positive
+                {% else %}
+                    net-negative
+                {% endif %}">
+
+                {% if net_cash_movement > 0 %}+{% endif %}
+                ¥{{ "{:,.0f}".format(net_cash_movement) }}
+
+            </div>
+
+            <p class="empty-message">
+                Cash In minus Cash Out for {{ selected_month }}.
+            </p>
+        </div>
+
+        <h2 class="section-title">
+            Income and Expense Breakdown
+        </h2>
+
+        <div class="report-grid">
+
+            <div class="report-card">
+                <h3>Income by Category</h3>
+
+                {% if income_breakdown %}
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Category</th>
+                                <th>Amount</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            {% for category, amount in income_breakdown %}
+                                <tr>
+                                    <td>{{ category }}</td>
+                                    <td>
+                                        ¥{{ "{:,.0f}".format(amount) }}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <p class="empty-message">
+                        No income recorded for this month.
+                    </p>
+                {% endif %}
+            </div>
+
+            <div class="report-card">
+                <h3>Expenses by Category</h3>
+
+                {% if expense_breakdown %}
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Category</th>
+                                <th>Amount</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            {% for category, amount in expense_breakdown %}
+                                <tr>
+                                    <td>{{ category }}</td>
+                                    <td>
+                                        ¥{{ "{:,.0f}".format(amount) }}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <p class="empty-message">
+                        No expenses recorded for this month.
+                    </p>
+                {% endif %}
+            </div>
+
+        </div>
+
+        <h2 class="section-title">
+            Loans and Savings
+        </h2>
+
+        <div class="report-card">
+
+            <table class="movement-table">
+                <tbody>
+
+                    <tr>
+                        <td>Money Borrowed</td>
+                        <td>¥{{ "{:,.0f}".format(borrowed_total) }}</td>
+                    </tr>
+
+                    <tr>
+                        <td>Money Lent</td>
+                        <td>¥{{ "{:,.0f}".format(lent_total) }}</td>
+                    </tr>
+
+                    <tr>
+                        <td>Borrowed Loan Repayments</td>
+                        <td>¥{{ "{:,.0f}".format(borrowed_repayments) }}</td>
+                    </tr>
+
+                    <tr>
+                        <td>Collections from Lent Loans</td>
+                        <td>¥{{ "{:,.0f}".format(lent_collections) }}</td>
+                    </tr>
+
+                    <tr>
+                        <td>Savings Deposits</td>
+                        <td>¥{{ "{:,.0f}".format(savings_deposits) }}</td>
+                    </tr>
+
+                    <tr>
+                        <td>Savings Withdrawals</td>
+                        <td>¥{{ "{:,.0f}".format(savings_withdrawals) }}</td>
+                    </tr>
+
+                    <tr class="total-row">
+                        <td>Net Cash Movement</td>
+                        <td>
+                            ¥{{ "{:,.0f}".format(net_cash_movement) }}
+                        </td>
+                    </tr>
+
+                </tbody>
+            </table>
+
+        </div>
+
+        <a href="{{ url_for('main.dashboard') }}" class="back-link">
+            ← Back to Dashboard
+        </a>
+
+    </main>
+
+</body>
+</html>

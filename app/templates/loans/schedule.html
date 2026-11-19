@@ -1,0 +1,157 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Installment Schedule | Home Finance</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body class="page-loans-schedule">
+
+    <div class="navbar">
+        <strong><img class="site-logo" src="{{ url_for('static', filename='kd-logo.jpg') }}" alt="">Home Finance — Loan Management</strong>
+    </div>
+
+    <div class="container">
+
+        <h2>Installment Schedule</h2>
+
+        <p>
+            <strong>{{ loan.counterparty }}</strong>
+            — {{ loan.loan_type|capitalize }} Loan
+        </p>
+
+        <div class="loan-info">
+
+            <div class="info-card">
+                <div class="info-label">Principal Amount</div>
+                <div class="info-value">
+                    ¥{{ "{:,.0f}".format(loan.principal_amount) }}
+                </div>
+            </div>
+
+            <div class="info-card">
+                <div class="info-label">Monthly Interest Rate</div>
+                <div class="info-value">
+                    {{ loan.monthly_interest_rate }}%
+                </div>
+            </div>
+
+            <div class="info-card">
+                <div class="info-label">Repayment Method</div>
+                <div class="info-value">
+                    {% if loan.repayment_method == "flexible" %}
+                        Flexible
+                    {% else %}
+                        Four Installments
+                    {% endif %}
+                </div>
+            </div>
+
+        </div>
+
+        {% if loan.repayment_method == "flexible" %}
+
+            <div class="empty">
+                This is a personal loan with flexible repayment.
+                It does not have a fixed four-installment schedule.
+                Monthly interest accrual and flexible payments will be
+                managed separately.
+            </div>
+
+        {% elif installments %}
+
+            <div class="table-wrapper">
+
+                <table>
+
+                    <thead>
+                        <tr>
+                            <th>Installment</th>
+                            <th>Due Date</th>
+                            <th>Principal</th>
+                            <th>Interest</th>
+                            <th>Total Due</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        {% for item in installments %}
+
+                            <tr>
+                                <td>
+                                    #{{ item.installment_number }}
+                                </td>
+
+                                <td>
+                                    {{ item.due_date.strftime("%d %b %Y") }}
+                                </td>
+
+                                <td>
+                                    ¥{{ "{:,.0f}".format(item.principal_due) }}
+                                </td>
+
+                                <td>
+                                    ¥{{ "{:,.0f}".format(item.interest_due) }}
+                                </td>
+
+                                <td>
+                                    <strong>
+                                        ¥{{ "{:,.0f}".format(item.principal_due + item.interest_due) }}
+                                    </strong>
+                                </td>
+
+                                <td>
+                                    <span class="status {{ item.status }}">
+                                        {{ item.status }}
+                                    </span>
+                                </td>
+                            </tr>
+
+                        {% endfor %}
+
+                        <tr class="total-row">
+                            <td colspan="2">Total</td>
+
+                            <td>
+                                ¥{{ "{:,.0f}".format(total_principal) }}
+                            </td>
+
+                            <td>
+                                ¥{{ "{:,.0f}".format(total_interest) }}
+                            </td>
+
+                            <td>
+                                ¥{{ "{:,.0f}".format(total_due) }}
+                            </td>
+
+                            <td>—</td>
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        {% else %}
+
+            <div class="empty">
+                No installment records were found for this loan.
+            </div>
+
+        {% endif %}
+
+        <a href="{{ url_for('loans.index') }}" class="back-link">
+            Back to Loan List
+        </a>
+
+    </div>
+
+</body>
+</html>

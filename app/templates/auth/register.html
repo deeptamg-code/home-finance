@@ -1,0 +1,57 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Account | Home Finance</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body class="page-auth-register">
+
+    <div class="register-container">
+
+        <h1><img class="site-logo" src="{{ url_for('static', filename='kd-logo.jpg') }}" alt="">Home Finance</h1>
+        <p class="subtitle">Create your personal account</p>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% for category, message in messages %}
+                <div class="message">{{ message }}</div>
+            {% endfor %}
+        {% endwith %}
+
+        <form method="POST" action="{{ url_for('auth.register') }}">
+
+            <input type="hidden" name="csrf_token"
+                   value="{{ csrf_token() }}">
+
+            <label>Username</label>
+            <input type="text" name="username"
+                   placeholder="Enter your username" required>
+
+            <label>Email Address</label>
+            <input type="email" name="email"
+                   placeholder="Enter your email" required>
+
+            <label>Password</label>
+            <input type="password" name="password"
+                   placeholder="At least 8 characters" minlength="8" required>
+
+            <label>Confirm Password</label>
+            <input type="password" name="confirm_password"
+                   placeholder="Confirm your password" required>
+
+            <button type="submit">Create Account</button>
+
+        </form>
+
+        <p class="login-link">
+            Already have an account?
+            <a href="{{ url_for('auth.login') }}">Login</a>
+        </p>
+
+    </div>
+
+</body>
+</html>

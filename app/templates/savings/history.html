@@ -1,0 +1,89 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Savings History | Home Finance</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body class="page-savings-history">
+
+    <nav class="navbar">
+        <h2><img class="site-logo" src="{{ url_for('static', filename='kd-logo.jpg') }}" alt="">Home Finance</h2>
+    </nav>
+
+    <main class="container">
+
+        <div class="header">
+            <h1>Savings Transaction History</h1>
+            <p>Goal: <strong>{{ goal.name }}</strong></p>
+        </div>
+
+        <section class="summary">
+            <span>Current Savings Balance</span>
+            <strong>¥{{ "{:,.0f}".format(current_balance) }}</strong>
+        </section>
+
+        <section class="card">
+
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Type</th>
+                            <th>Amount</th>
+                            <th>Note</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for item in transactions %}
+                        <tr>
+                            <td>{{ item.transaction_date.strftime("%Y-%m-%d") }}</td>
+
+                            <td class="{{ item.transaction_type }}">
+                                {{ item.transaction_type|title }}
+                            </td>
+
+                            <td class="amount">
+                                {% if item.transaction_type == "deposit" %}
+                                    + ¥{{ "{:,.0f}".format(item.amount) }}
+                                {% else %}
+                                    - ¥{{ "{:,.0f}".format(item.amount) }}
+                                {% endif %}
+                            </td>
+
+                            <td>{{ item.note or "-" }}</td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="4" class="empty">
+                                No transactions have been recorded for this goal yet.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="buttons">
+                <a href="{{ url_for('savings.transaction', goal_id=goal.id) }}"
+                   class="button primary">
+                    Add Transaction
+                </a>
+
+                <a href="{{ url_for('savings.index') }}"
+                   class="button secondary">
+                    Back to Savings Goals
+                </a>
+            </div>
+
+        </section>
+
+    </main>
+
+</body>
+</html>

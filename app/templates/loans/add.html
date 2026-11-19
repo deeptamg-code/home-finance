@@ -1,0 +1,225 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Add Loan | Home Finance</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body class="page-loans-add">
+
+    <div class="navbar">
+        <strong><img class="site-logo" src="{{ url_for('static', filename='kd-logo.jpg') }}" alt="">Home Finance — Loan Management</strong>
+    </div>
+
+    <div class="container">
+
+        <h2>Add New Loan</h2>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <form method="POST">
+
+            <input type="hidden" name="csrf_token"
+                   value="{{ csrf_token() }}">
+
+            <div class="form-group">
+                <label for="loan_type">Loan Type</label>
+
+                <select name="loan_type" id="loan_type" required>
+                    <option value="">Select loan type</option>
+                    <option value="personal">Personal</option>
+                    <option value="bank">Bank</option>
+                    <option value="finance">Finance</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="direction">Loan Direction</label>
+
+                <select name="direction" id="direction" required>
+                    <option value="">Select direction</option>
+                    <option value="borrowed">Borrowed Money</option>
+                    <option value="lent">Lent Money</option>
+                </select>
+
+                <div class="help">
+                    Borrowed = You receive money.
+                    Lent = You give money to someone.
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="counterparty">
+                    Lender / Borrower Name
+                </label>
+
+                <input
+                    type="text"
+                    name="counterparty"
+                    id="counterparty"
+                    placeholder="Enter person's or institution's name"
+                    required
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="principal_amount">
+                    Principal Amount (JPY)
+                </label>
+
+                <input
+                    type="number"
+                    name="principal_amount"
+                    id="principal_amount"
+                    min="0.01"
+                    step="0.01"
+                    placeholder="Example: 200000"
+                    required
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="monthly_interest_rate">
+                    Monthly Interest Rate (%)
+                </label>
+
+                <input
+                    type="number"
+                    name="monthly_interest_rate"
+                    id="monthly_interest_rate"
+                    min="0"
+                    step="0.01"
+                    value="2.00"
+                    required
+                >
+
+                <div class="help">
+                    Example: Enter 2 for 2% monthly interest.
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="repayment_method">
+                    Repayment Method
+                </label>
+
+                <select name="repayment_method"
+                        id="repayment_method"
+                        required>
+                    <option value="">Select loan type first</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="loan_date">Loan Date</label>
+
+                <input
+                    type="date"
+                    name="loan_date"
+                    id="loan_date"
+                    required
+                >
+            </div>
+
+            <div class="form-group" id="due-date-group">
+                <label for="first_due_date">
+                    First Installment Due Date
+                </label>
+
+                <input
+                    type="date"
+                    name="first_due_date"
+                    id="first_due_date"
+                >
+
+                <div class="help">
+                    Required for bank and finance loans.
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="note">Note</label>
+
+                <textarea
+                    name="note"
+                    id="note"
+                    placeholder="Optional notes about this loan"
+                ></textarea>
+            </div>
+
+            <div class="buttons">
+                <button type="submit">Save Loan</button>
+
+                <a href="{{ url_for('loans.index') }}"
+                   class="back-link">
+                    Cancel
+                </a>
+            </div>
+
+        </form>
+
+    </div>
+
+    <script>
+        const loanType = document.getElementById("loan_type");
+        const repaymentMethod = document.getElementById("repayment_method");
+        const dueDateGroup = document.getElementById("due-date-group");
+        const dueDateInput = document.getElementById("first_due_date");
+
+        function updateRepaymentMethod() {
+
+            repaymentMethod.innerHTML = "";
+
+            const option = document.createElement("option");
+
+            if (loanType.value === "personal") {
+
+                option.value = "flexible";
+                option.textContent = "Flexible Repayment";
+
+                repaymentMethod.add(option);
+                dueDateGroup.style.display = "none";
+                dueDateInput.required = false;
+
+            } else if (
+                loanType.value === "bank" ||
+                loanType.value === "finance"
+            ) {
+
+                option.value = "four_installments";
+                option.textContent = "Four Equal Principal Installments";
+
+                repaymentMethod.add(option);
+                dueDateGroup.style.display = "block";
+                dueDateInput.required = true;
+
+            } else {
+
+                option.value = "";
+                option.textContent = "Select loan type first";
+
+                repaymentMethod.add(option);
+                dueDateGroup.style.display = "block";
+                dueDateInput.required = false;
+            }
+        }
+
+        loanType.addEventListener("change", updateRepaymentMethod);
+
+        updateRepaymentMethod();
+    </script>
+
+</body>
+</html>

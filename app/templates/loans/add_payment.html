@@ -1,0 +1,106 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Loan Payment</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body class="page-loans-add-payment">
+
+<nav>
+    <a href="{{ url_for('main.dashboard') }}"><img class="site-logo" src="{{ url_for('static', filename='kd-logo.jpg') }}" alt="">Home Finance</a>
+</nav>
+
+<div class="container">
+
+    <h2>Add Loan Payment</h2>
+
+    <div class="info">
+        <strong>Counterparty:</strong> {{ loan.counterparty }}<br>
+        <strong>Loan Type:</strong> {{ loan.loan_type|title }}<br>
+        <strong>Direction:</strong> {{ loan.direction|title }}<br>
+        <strong>Principal:</strong> ¥{{ "{:,.0f}".format(loan.principal_amount) }}
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, message in messages %}
+            <div class="flash">{{ message }}</div>
+        {% endfor %}
+    {% endwith %}
+
+    <form method="POST">
+
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+        {% if loan.repayment_method == "four_installments" %}
+
+            <label for="installment_id">Select Installment</label>
+
+            <select name="installment_id" id="installment_id" required>
+                <option value="">-- Select Installment --</option>
+
+                {% for option in installment_options %}
+                <option value="{{ option.installment.id }}">
+                    Installment {{ option.installment.installment_number }}
+                    — Remaining ¥{{ "{:,.0f}".format(option.remaining_total) }}
+                </option>
+                {% endfor %}
+            </select>
+
+            {% if not installment_options %}
+                <p>All installments have been paid.</p>
+            {% endif %}
+
+        {% else %}
+
+            <div class="info">
+                This is a flexible personal loan. The system will calculate
+                completed monthly interest periods and allocate your payment
+                to interest first, then principal.
+            </div>
+
+        {% endif %}
+
+        <label for="amount">Payment Amount (JPY)</label>
+        <input
+            type="number"
+            name="amount"
+            id="amount"
+            min="0.01"
+            step="0.01"
+            placeholder="Enter payment amount"
+            required
+        >
+
+        <label for="payment_date">Payment Date</label>
+        <input
+            type="date"
+            name="payment_date"
+            id="payment_date"
+            value="{{ today.isoformat() }}"
+            required
+        >
+
+        <label for="note">Note (Optional)</label>
+        <textarea
+            name="note"
+            id="note"
+            placeholder="Payment details..."
+        ></textarea>
+
+        <button type="submit">Save Payment</button>
+
+    </form>
+
+    <a class="back"
+       href="{{ url_for('loans.payments', loan_id=loan.id) }}">
+        ← Back to Payment History
+    </a>
+
+</div>
+
+</body>
+</html>

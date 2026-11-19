@@ -1,0 +1,93 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Savings Transaction | Home Finance</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body class="page-savings-transaction">
+
+    <nav class="navbar">
+        <h2><img class="site-logo" src="{{ url_for('static', filename='kd-logo.jpg') }}" alt="">Home Finance</h2>
+    </nav>
+
+    <main class="container">
+
+        <section class="card">
+
+            <h1>Savings Transaction</h1>
+            <p>Goal: <strong>{{ goal.name }}</strong></p>
+
+            <div class="balance">
+                <span>Current Savings Balance</span>
+                <strong>¥{{ "{:,.0f}".format(current_balance) }}</strong>
+            </div>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% for category, message in messages %}
+                    <div class="flash {{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endwith %}
+
+            <form method="POST">
+
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                <div class="form-group">
+                    <label for="transaction_type">Transaction Type *</label>
+                    <select id="transaction_type" name="transaction_type" required>
+                        <option value="">Select transaction type</option>
+                        <option value="deposit"
+                            {% if request.form.get('transaction_type') == 'deposit' %}selected{% endif %}>
+                            Deposit
+                        </option>
+                        <option value="withdrawal"
+                            {% if request.form.get('transaction_type') == 'withdrawal' %}selected{% endif %}>
+                            Withdrawal
+                        </option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="amount">Amount (JPY) *</label>
+                    <input
+                        type="number"
+                        id="amount"
+                        name="amount"
+                        min="0.01"
+                        step="0.01"
+                        placeholder="Enter amount"
+                        value="{{ request.form.get('amount', '') }}"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="note">Note</label>
+                    <textarea
+                        id="note"
+                        name="note"
+                        placeholder="Optional transaction note"
+                    >{{ request.form.get('note', '') }}</textarea>
+                </div>
+
+                <div class="buttons">
+                    <button type="submit">Save Transaction</button>
+
+                    <a href="{{ url_for('savings.index') }}"
+                       class="cancel">
+                        Cancel
+                    </a>
+                </div>
+
+            </form>
+
+        </section>
+
+    </main>
+
+</body>
+</html>

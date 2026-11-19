@@ -1,0 +1,161 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Loan | Home Finance</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body class="page-loans-edit">
+
+    <div class="navbar">
+        <img class="site-logo" src="{{ url_for('static', filename='kd-logo.jpg') }}" alt="">Home Finance - Loan Management</strong>
+    </div>
+
+    <div class="container">
+
+        <h2>Edit Loan #{{ loan.id }}</h2>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        {% if terms_locked %}
+            <div class="notice">
+                This loan has payment or interest history.
+                Its financial details are locked to protect existing records.
+                You can still edit the lender/borrower name and note.
+            </div>
+        {% endif %}
+
+        <form method="POST">
+
+            <input type="hidden" name="csrf_token"
+                   value="{{ csrf_token() }}">
+
+            <div class="form-group">
+                <label for="loan_type">Loan Type</label>
+                <select name="loan_type" id="loan_type"
+                        {% if terms_locked %}disabled{% endif %} required>
+
+                    <option value="personal"
+                        {% if loan.loan_type == "personal" %}selected{% endif %}>
+                        Personal
+                    </option>
+
+                    <option value="bank"
+                        {% if loan.loan_type == "bank" %}selected{% endif %}>
+                        Bank
+                    </option>
+
+                    <option value="finance"
+                        {% if loan.loan_type == "finance" %}selected{% endif %}>
+                        Finance
+                    </option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="direction">Loan Direction</label>
+                <select name="direction" id="direction"
+                        {% if terms_locked %}disabled{% endif %} required>
+
+                    <option value="borrowed"
+                        {% if loan.direction == "borrowed" %}selected{% endif %}>
+                        Borrowed Money
+                    </option>
+
+                    <option value="lent"
+                        {% if loan.direction == "lent" %}selected{% endif %}>
+                        Lent Money
+                    </option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="counterparty">Lender / Borrower Name</label>
+                <input type="text" name="counterparty" id="counterparty"
+                       value="{{ loan.counterparty }}" required>
+            </div>
+
+            <div class="form-group">
+                <label for="principal_amount">Principal Amount (JPY)</label>
+                <input type="number" name="principal_amount"
+                       id="principal_amount"
+                       min="0.01" step="0.01"
+                       value="{{ loan.principal_amount }}"
+                       {% if terms_locked %}disabled{% endif %} required>
+            </div>
+
+            <div class="form-group">
+                <label for="monthly_interest_rate">
+                    Monthly Interest Rate (%)
+                </label>
+                <input type="number" name="monthly_interest_rate"
+                       id="monthly_interest_rate"
+                       min="0" step="0.01"
+                       value="{{ loan.monthly_interest_rate }}"
+                       {% if terms_locked %}disabled{% endif %} required>
+            </div>
+
+            <div class="form-group">
+                <label for="repayment_method">Repayment Method</label>
+                <select name="repayment_method" id="repayment_method"
+                        {% if terms_locked %}disabled{% endif %} required>
+
+                    <option value="flexible"
+                        {% if loan.repayment_method == "flexible" %}selected{% endif %}>
+                        Flexible Repayment
+                    </option>
+
+                    <option value="four_installments"
+                        {% if loan.repayment_method == "four_installments" %}selected{% endif %}>
+                        Four Equal Principal Installments
+                    </option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="loan_date">Loan Date</label>
+                <input type="date" name="loan_date" id="loan_date"
+                       value="{{ loan.loan_date.isoformat() }}"
+                       {% if terms_locked %}disabled{% endif %} required>
+            </div>
+
+            <div class="form-group">
+                <label for="first_due_date">
+                    First Installment Due Date
+                </label>
+                <input type="date" name="first_due_date"
+                       id="first_due_date"
+                       value="{{ loan.first_due_date.isoformat() if loan.first_due_date else '' }}"
+                       {% if terms_locked %}disabled{% endif %}>
+                <div class="help">
+                    Required for bank and finance loans.
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="note">Note</label>
+                <textarea name="note" id="note">{{ loan.note or "" }}</textarea>
+            </div>
+
+            <div class="buttons">
+                <button type="submit">Save Changes</button>
+
+                <a href="{{ url_for('loans.index') }}" class="back-link">
+                    Cancel
+                </a>
+            </div>
+
+        </form>
+    </div>
+
+</body>
+</html>

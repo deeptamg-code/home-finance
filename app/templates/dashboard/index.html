@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+    <section class="page-intro" aria-labelledby="page-title">
+        <div>
+            <p class="eyebrow">Your money, in one place</p>
+            <h1 id="page-title">Welcome back, {{ current_user.username }}.</h1>
+            <p class="intro-copy">A clear view of your finances, whenever you need it.</p>
+        </div>
+
+        <div class="intro-actions" aria-label="Quick actions">
+            <a class="action-link" href="{{ url_for('income.add') }}">
+                <span class="action-plus" aria-hidden="true">+</span>
+                Add income
+            </a>
+            <a class="action-link primary" href="{{ url_for('expenses.add') }}">
+                <span class="action-plus" aria-hidden="true">+</span>
+                Add expense
+            </a>
+        </div>
+    </section>
+
+    <section aria-labelledby="overview-title">
+        <div class="section-heading">
+            <div>
+                <h2 id="overview-title">Financial overview</h2>
+                <p>Your current balances and spending this month</p>
+            </div>
+        </div>
+
+        <div class="summary-grid">
+            <article class="summary-card">
+                <div class="summary-card-top">
+                    <p class="summary-label">Total Account Balance</p>
+                    <span class="summary-icon account-icon" aria-hidden="true">&yen;</span>
+                </div>
+                <div class="summary-value">{{ cash_balance }}</div>
+                <p class="summary-note">Across all accounts</p>
+            </article>
+
+            <article class="summary-card">
+                <div class="summary-card-top">
+                    <p class="summary-label">Monthly Income</p>
+                    <span class="summary-icon income-icon" aria-hidden="true">&#8599;</span>
+                </div>
+                <div class="summary-value">{{ monthly_income }}</div>
+                <p class="summary-note income-note">Income received this month</p>
+            </article>
+
+            <article class="summary-card">
+                <div class="summary-card-top">
+                    <p class="summary-label">Monthly Expenses</p>
+                    <span class="summary-icon expense-icon" aria-hidden="true">&#8601;</span>
+                </div>
+                <div class="summary-value">{{ monthly_expenses }}</div>
+                <p class="summary-note expense-note">Expenses this month</p>
+            </article>
+
+            <article class="summary-card">
+                <div class="summary-card-top">
+                    <p class="summary-label">Total Loan Balance</p>
+                    <span class="summary-icon loan-icon" aria-hidden="true">&#9633;</span>
+                </div>
+                <div class="summary-value">{{ outstanding_borrowed_loans }}</div>
+                <p class="summary-note">Outstanding borrowed loans</p>
+            </article>
+        </div>
+    </section>
+
+    <div class="dashboard-panels">
+        <section class="dashboard-panel" aria-labelledby="cash-flow-title">
+            <div class="panel-header">
+                <div>
+                    <h2 id="cash-flow-title">Monthly Cash Flow</h2>
+                    <p>Income and expenses overview</p>
+                </div>
+                <span class="period-badge">This Month</span>
+            </div>
+
+            <div class="cashflow-list">
+                <div class="cashflow-item">
+                    <div class="cashflow-label">
+                        <span>Income</span>
+                        <strong class="income-amount">{{ monthly_income }}</strong>
+                    </div>
+                    <progress
+                        class="cashflow-progress income-progress"
+                        value="{{ monthly_income_amount }}"
+                        max="{{ cashflow_scale }}"
+                        aria-label="Income this month"
+                    ></progress>
+                </div>
+
+                <div class="cashflow-item">
+                    <div class="cashflow-label">
+                        <span>Expenses</span>
+                        <strong class="expense-amount">{{ monthly_expenses }}</strong>
+                    </div>
+                    <progress
+                        class="cashflow-progress expense-progress"
+                        value="{{ monthly_expenses_amount }}"
+                        max="{{ cashflow_scale }}"
+                        aria-label="Expenses this month"
+                    ></progress>
+                </div>
+
+                <div class="cashflow-item">
+                    <div class="cashflow-label">
+                        <span>Savings Allocation</span>
+                        <strong class="allocation-amount">{{ savings_allocation_display }}</strong>
+                    </div>
+                    <progress
+                        class="cashflow-progress allocation-progress"
+                        value="{{ monthly_savings_allocation }}"
+                        max="{{ cashflow_scale }}"
+                        aria-label="Savings allocated this month"
+                    ></progress>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+{% endblock %}

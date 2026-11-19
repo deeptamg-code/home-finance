@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f5f7f5">
+    <title>{% block title %}Home Finance{% endblock %} · Home Finance</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    {% block head %}{% endblock %}
+</head>
+<body class="{% if request.endpoint == 'main.dashboard' %}page-dashboard{% endif %}">
+    <header class="topbar">
+        <div class="topbar-inner">
+            <a class="brand" href="{{ url_for('main.dashboard') }}" aria-label="Home Finance dashboard">
+                <img class="brand-logo" src="{{ url_for('static', filename='kd-logo.jpg') }}" alt="">
+                <span>Home Finance</span>
+            </a>
+
+            {% if current_user.is_authenticated %}
+                <nav class="primary-nav" aria-label="Main navigation">
+                    <a href="{{ url_for('main.dashboard') }}"
+                       {% if request.endpoint == 'main.dashboard' %}aria-current="page"{% endif %}>Overview</a>
+                    <a href="{{ url_for('income.index') }}"
+                       {% if request.endpoint and request.endpoint.startswith('income.') %}aria-current="page"{% endif %}>Income</a>
+                    <a href="{{ url_for('expenses.index') }}"
+                       {% if request.endpoint and request.endpoint.startswith('expenses.') %}aria-current="page"{% endif %}>Expenses</a>
+                    <a href="{{ url_for('loans.index') }}"
+                       {% if request.endpoint and request.endpoint.startswith('loans.') %}aria-current="page"{% endif %}>Loans</a>
+                    <a href="{{ url_for('savings.index') }}"
+                       {% if request.endpoint and request.endpoint.startswith('savings.') %}aria-current="page"{% endif %}>Savings</a>
+                    <a href="{{ url_for('reports.index') }}"
+                       {% if request.endpoint and request.endpoint.startswith('reports.') %}aria-current="page"{% endif %}>Reports</a>
+                </nav>
+
+                <div class="topbar-account">
+                    <span class="greeting">Hi, {{ current_user.username }}</span>
+                    <form method="POST" action="{{ url_for('auth.logout') }}">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <button class="logout-button" type="submit">Log out</button>
+                    </form>
+                </div>
+            {% else %}
+                <span class="topbar-note">Personal finance, made clear</span>
+            {% endif %}
+        </div>
+    </header>
+
+    <main class="page">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="messages" role="status">
+                    {% for category, message in messages %}
+                        <p class="message {{ category }}">{{ message }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="footer">Your personal finance overview</footer>
+</body>
+</html>
