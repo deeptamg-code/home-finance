@@ -1,6 +1,6 @@
 
 import os
-from flask import Flask
+from flask import Flask, send_from_directory
 
 from config import Config
 from app.extensions import db, migrate, login_manager, csrf
@@ -54,6 +54,19 @@ def create_app():
     app.register_blueprint(savings_bp, url_prefix="/savings")
     app.register_blueprint(loans_bp, url_prefix="/loans")
     app.register_blueprint(reports_bp, url_prefix="/reports")
+
+    # PWA: Serve the service worker from the website root.
+    # This allows it to control the whole application.
+    @app.route("/sw.js")
+    def service_worker():
+        response = send_from_directory(
+            app.static_folder,
+            "sw.js",
+            mimetype="application/javascript"
+        )
+        response.headers["Service-Worker-Allowed"] = "/"
+        response.headers["Cache-Control"] = "no-cache"
+        return response
 
     return app
 

@@ -1,13 +1,34 @@
+
 <!doctype html>
 <html lang="en">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="theme-color" content="#f5f7f5">
-    <title>{% block title %}Home Finance{% endblock %} · Home Finance</title>
+
+    <meta name="theme-color" content="#172554">
+    <meta name="description" content="Your personal finance overview">
+
+    <!-- PWA manifest -->
+    <link rel="manifest" href="{{ url_for('static', filename='manifest.webmanifest') }}">
+
+    <!-- App icons -->
+    <link rel="icon" type="image/png"
+          href="{{ url_for('static', filename='home-finance-kd-icon-192.png') }}"
+    <link rel="apple-touch-icon"
+          href="{{ url_for('static', filename='home-finance-kd-icon-192.png') }}"
+
+    <!-- Mobile app appearance -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Home Finance">
+
+    <title>{% block title %}Home Finance{% endblock %}</title>
+
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
     {% block head %}{% endblock %}
 </head>
+
 <body class="{% if request.endpoint == 'main.dashboard' %}page-dashboard{% endif %}">
     <header class="topbar">
         <div class="topbar-inner">
@@ -55,9 +76,25 @@
                 </div>
             {% endif %}
         {% endwith %}
+
         {% block content %}{% endblock %}
     </main>
 
     <footer class="footer">Your personal finance overview</footer>
+
+    <!-- Register PWA service worker -->
+    <script>
+        if ("serviceWorker" in navigator) {
+            window.addEventListener("load", function () {
+                navigator.serviceWorker.register("/sw.js")
+                    .then(function (registration) {
+                        console.log("Home Finance PWA ready:", registration.scope);
+                    })
+                    .catch(function (error) {
+                        console.error("PWA registration failed:", error);
+                    });
+            });
+        }
+    </script>
 </body>
 </html>
