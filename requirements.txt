@@ -6,3 +6,4 @@ Flask-Login
 Flask-WTF
 email-validator
 python-dotenv
+reportlab>=4,<5
