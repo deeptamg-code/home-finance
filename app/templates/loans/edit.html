@@ -9,6 +9,8 @@
 </head>
 
 <body class="page-loans-edit">
+{% if current_user.is_authenticated %}<aside class="app-sidebar"><a class="sidebar-brand" href="{{ url_for('main.dashboard') }}"><img src="{{ url_for('static', filename='kd-logo.jpg') }}" alt="KD"><span><strong>HOME</strong><small>FINANCE</small></span></a><div class="sidebar-caption">MAIN MENU</div><nav class="sidebar-nav" aria-label="Main navigation"><a href="{{ url_for('main.dashboard') }}" class="{% if request.endpoint == 'main.dashboard' %}active{% endif %}"><span>⌂</span>Dashboard</a><a href="{{ url_for('income.index') }}" class="{% if request.endpoint and request.endpoint.startswith('income.') %}active{% endif %}"><span>↗</span>Income</a><a href="{{ url_for('expenses.index') }}" class="{% if request.endpoint and request.endpoint.startswith('expenses.') %}active{% endif %}"><span>↘</span>Expenses</a><a href="{{ url_for('savings.index') }}" class="{% if request.endpoint and request.endpoint.startswith('savings.') %}active{% endif %}"><span>◇</span>Savings</a><a href="{{ url_for('loans.index') }}" class="{% if request.endpoint and request.endpoint.startswith('loans.') %}active{% endif %}"><span>▤</span>Loans</a><a href="{{ url_for('reports.index') }}" class="{% if request.endpoint and request.endpoint.startswith('reports.') %}active{% endif %}"><span>▥</span>Reports</a></nav><div class="sidebar-bottom"><div class="sidebar-user"><span class="user-avatar">{{ current_user.username[:1]|upper }}</span><span><strong>{{ current_user.username }}</strong><small>Personal account</small></span></div><form method="POST" action="{{ url_for('auth.logout') }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="sidebar-logout" type="submit"><span>⇥</span>Log out</button></form></div></aside>{% endif %}<div class="app-main"><header class="app-topbar"><div class="topbar-kicker">PERSONAL WEALTH MANAGEMENT</div><div class="topbar-right"><span class="status-dot"></span> Your finances, organized <span class="topbar-divider"></span><strong>{{ current_user.username if current_user.is_authenticated else '' }}</strong></div></header>
+
 
     <div class="navbar">
         <img class="site-logo" src="{{ url_for('static', filename='kd-logo.jpg') }}" alt="">Home Finance - Loan Management</strong>
@@ -157,5 +159,5 @@
         </form>
     </div>
 
-</body>
+<footer class="footer">HOME FINANCE <span>•</span> Your Wealth. Your Control.</footer></div></body>
 </html>
