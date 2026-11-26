@@ -1,9 +1,8 @@
-
 from flask import render_template, request, redirect, url_for, flash
 from flask_login import login_user, logout_user, current_user
 
 from app.routes import auth_bp
-from app.extensions import db
+from app.extensions import db, limiter
 from app.models import User, FinancialSettings
 
 
@@ -11,6 +10,7 @@ from app.models import User, FinancialSettings
 # User Registration
 # -----------------------------
 @auth_bp.route("/register", methods=["GET", "POST"])
+@limiter.limit("3 per hour", methods=["POST"])
 def register():
 
     if current_user.is_authenticated:
@@ -47,6 +47,7 @@ def register():
                 email=email
             )
 
+            # Store only a secure password hash, never the plain password.
             user.set_password(password)
 
             db.session.add(user)
@@ -76,6 +77,7 @@ def register():
 # User Login
 # -----------------------------
 @auth_bp.route("/login", methods=["GET", "POST"])
+@limiter.limit("5 per minute", methods=["POST"])
 def login():
 
     if current_user.is_authenticated:
@@ -90,12 +92,14 @@ def login():
 
         if user and user.check_password(password):
 
-            login_user(user)
+            # Flask-Login stores the authenticated user ID in the signed session.
+            login_user(user, fresh=True)
 
             flash("Welcome back!", "success")
 
             return redirect(url_for("main.dashboard"))
 
+        # Keep the message generic so the page does not reveal whether an email exists.
         flash("Invalid email or password.", "danger")
 
     return render_template("auth/login.html")
