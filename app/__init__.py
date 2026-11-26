@@ -1,9 +1,8 @@
-
 import os
 from flask import Flask, send_from_directory
 
 from config import Config
-from app.extensions import db, migrate, login_manager, csrf
+from app.extensions import db, migrate, login_manager, csrf, limiter
 
 
 def create_app():
@@ -21,6 +20,7 @@ def create_app():
     migrate.init_app(app, db)
     login_manager.init_app(app)
     csrf.init_app(app)
+    limiter.init_app(app)
 
     # Import models
     from app import models
